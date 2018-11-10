@@ -1,0 +1,178 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<title>Krayt Clan: Dragon Arena</title>
+</head>
+<body>
+<div id="arena" class="container-fluid">
+	<h1>Krayt Clan: Dragon Arena</h1>
+	<h2>Select Your Character</h2>
+	<div id="buttons">
+		<h3 id="attack" class="btn btn-success">Attack</h3>
+		<h3 id="reset" class="btn btn-warning">Reset</h3>
+	</div>
+	<div id="roster" class="row"></div>
+</div>
+<script>
+$(document).ready(function(){
+	var selection;
+	var player;
+	var enemy;
+	var enemy2;
+	var enemy3;
+	var enemyCamp = [];
+	var enemiesLeft = [];
+	var opponent;
+	var victories = 0;
+	var mando_array = [
+		{
+			name: 'OriCabur',
+			img: 'images/ori_cabur.png',
+			HP: 180,
+			AP: 8,
+			CAP: 25
+		},
+		{
+			name: 'MorutNaast',
+			img: 'images/morut_naast.png',
+			HP: 150,
+			AP: 6,
+			CAP: 20
+		},
+		{
+			name: 'Bansidhe',
+			img: 'images/bansidhe.png',
+			HP: 120,
+			AP: 5,
+			CAP: 15
+		},
+		{
+			name: 'JagBevikika',
+			img: 'images/jag_bevikika.png',
+			HP: 100,
+			AP: 4,
+			CAP: 10
+		}
+	];
+	for (i = 0; i < mando_array.length; i++){
+		$('#roster').append('<div id="' + mando_array[i].name + '" class="col-3 selection"><img src="' + mando_array[i].img + '" alt="Roster Image"><h4>HP: ' + mando_array[i].HP + '</h4></div>');
+	};
+	//Player Select Function
+	$('.selection').click(function(){
+		$('h2').html('Select Your Opponent');
+		$('#roster').html("<div id='challenger' class='col-4 d-flex justify-content-center'></div><div id='opponent' class='col-4 d-flex justify-content-center'></div><div id='enemies' class='col-4'></div>");
+		selection = $(this).attr('id');
+		for (i = 0; i < mando_array.length; i++) {
+			if (mando_array[i].name == selection){
+				player = {name: mando_array[i].name, img: mando_array[i].img, HP: mando_array[i].HP, AP: mando_array[i].AP, CAP: mando_array[i].CAP};
+				$('#challenger').html('<div id="' + player.name + '"><img src="' + player.img + '"alt="Player Image"><h4>HP:' + player.HP + '</h4><h5>ATK: ' + player.AP + '</h5></div>');
+			} else {
+				enemy = {name: mando_array[i].name, img: mando_array[i].img, HP: mando_array[i].HP, AP: mando_array[i].AP, CAP: mando_array[i].CAP};
+				$('#enemies').append('<div id="' + enemy.name + '" class="row d-flex justify-content-center opp-select"><img src="' + enemy.img + '"alt="Enemy Image"><h4>HP:' + enemy.HP + '</h4></div>');
+				enemyCamp.push(enemy);
+			};
+		};
+	});
+	//Enemy Select Function
+	$(document).on('click','.opp-select',function(){
+		$('h2').html("Fight!");
+		$('#attack').css('display','inline');
+		$('#enemies').html('');
+		opponent = $(this).attr('id');
+		for (i = 0; i < enemyCamp.length; i++) {
+			if (enemyCamp[i].name == opponent) {
+				opponent = {name: enemyCamp[i].name, img: enemyCamp[i].img, HP: enemyCamp[i].HP, AP: enemyCamp[i].AP, CAP: enemyCamp[i].CAP};
+				$('#opponent').html('<div><img src="' + opponent.img + '" alt="Enemy Image"><h4>HP: ' + opponent.HP + '</h4><h5>ATK: ' + opponent.CAP + '</h5></div>');
+			} else {
+				enemy2 = {name: enemyCamp[i].name, img: enemyCamp[i].img, HP: enemyCamp[i].HP, AP: enemyCamp[i].AP, CAP: enemyCamp[i].CAP};
+				enemiesLeft.push(enemy2);
+			};
+		};
+		for (j = 0; j < enemiesLeft.length; j++){
+			enemy3 = {name: enemiesLeft[j].name, img: enemiesLeft[j].img, HP: enemiesLeft[j].HP, AP: enemiesLeft[j].AP, CAP: enemiesLeft[j].CAP};
+			$('#enemies').append('<div id="' + enemy3.name + '" class="row d-flex justify-content-center"><img src="' + enemy3.img + '" alt="Enemy Image"><h4>HP: ' + enemy3.HP + '</h4></div>');
+		};
+		enemyCamp = enemiesLeft;
+		enemiesLeft = [];
+	});
+	//Battle Function
+	$('#attack').click(function(){
+		opponent.HP = opponent.HP - player.AP;
+		$('#opponent h4').html('HP: ' + opponent.HP);
+		player.AP = player.AP + player.AP;
+		$('#challenger h5').html('ATK: ' + player.AP);
+		if (opponent.HP < 1) {
+			$('#opponent div').remove();
+			$('h2').html("Enemy Defeated! Pick a new opponent!");
+			$('#attack').css('display','none');
+			$('#enemies .row').addClass('opp-select');
+			victories++;
+			if (victories == 3) {
+				$('h2').html("All Enemies Defeated! You Win!");
+				$('#reset').css('display','inline');
+			}
+		} else {
+			player.HP = player.HP - opponent.CAP;
+			$('#challenger h4').html('HP: ' + player.HP);
+			if (player.HP < 1) {
+				$('#attack').css('display','none');
+				$('#reset').css('display','inline');
+				$('h2').text("You're Defeated! Game Over");
+				player.HP = 0;
+			}
+		}
+	});
+	//Reset Function
+	$('#reset').click(function(){
+		window.location.reload();
+	});
+	
+	
+});
+</script>
+<style>
+	body {
+		background-color: #111;
+		color: #E1E1E1;
+	}
+	h1,h2,h3,h4,h5,h6 {
+		text-align: center;
+	}
+	#buttons {
+		height: 50px;
+	}
+	#attack, #reset {
+		margin-left: calc(50% - 40px);
+		display: none;
+	}
+	#roster img, #challenger img {
+		width: 100%;
+	}
+	#challenger img {
+		height: 550px;
+		width: auto;
+	}
+	#enemies img {
+		height: 200px;
+		width: auto;
+	}
+	#roster .col-3:hover {
+		border: 5px solid #E1E1E1;
+		cursor: pointer;
+	}
+	.opp-select:hover {
+		background-color: #2B0000;
+		cursor: pointer;
+	}
+	#opponent img {
+		height: 550px;
+		width: auto;
+	}
+</style>
+</body>
+</html>
