@@ -1,4 +1,4 @@
-Quiz Game
+# Star Wars Battle Game
 
 Technologies used: jQuery, Bootstrap
 
